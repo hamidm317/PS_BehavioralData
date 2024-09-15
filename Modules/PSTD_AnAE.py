@@ -61,51 +61,130 @@ class PS_Task_Dataset():
 
             assert sublist >= 0 and sublist < self.population, "Insert valid subject number"
 
-            Acc = []
+            sublist = [sublist]
 
-            for i in range(self.EL[sublist]):
+        #     Acc = []
 
-                Acc.append(1 - np.sum(self.G_Choices[sublist][:i]) / (i + 1))
+        #     for i in range(self.EL[sublist]):
+
+        #         Acc.append(1 - np.sum(self.G_Choices[sublist][:i]) / (i + 1))
+
+        #     if ax != None:
+
+        #         ax.plot(Acc)
+        #         ax.set_xlabel("Trial Number")
+        #         ax.set_ylabel("Accuracy")
+        #         ax.set_title("Subject " + str(sublist) + " perfromance during trials")
+
+        #     return Acc
+
+        # else:
+
+        Acc = []
+
+        sublist = np.array(sublist)
+
+        assert sublist.ndim == 1, "List of Subjects must be 1-Dimensional"
+        assert np.all(sublist < self.population) and np.all(sublist >= 0), "Invalid subject in list"
+
+        if ax != None:
+
+            print("We plot what you want, but trial lengths may be different!")
+            ax.set_xlabel("Trial Number")
+            ax.set_ylabel("Accuracy")
+
+        for sub in sublist:
+
+            Acc_sub = []
+
+            for i in range(self.EL[sub]):
+
+                Acc_sub.append(1 - np.sum(self.G_Choices[sub][:i]) / (i + 1))
 
             if ax != None:
 
-                ax.plot(Acc)
-                ax.set_xlabel("Trial Number")
-                ax.set_ylabel("Accuracy")
-                ax.set_title("Subject " + str(sublist) + " perfromance during trials")
+                ax.plot(Acc_sub)
 
-            return Acc
+            Acc.append(Acc_sub)
 
-        else:
+        return Acc
 
-            Acc = []
+    def StagedAccuracy(self, sublist, NumStages = 5):
 
-            sublist = np.array(sublist)
+        assert type(sublist) == int or type(sublist) == list or type(sublist) == np.ndarray, "Subjects list/number must be integer or list/array of integers"
 
-            assert sublist.ndim == 1, "List of Subjects must be 1-Dimensional"
-            assert np.all(sublist < self.population) and np.all(sublist >= 0), "Invalid subject in list"
+        if type(sublist) == int:
+
+            sublist = [sublist]
+
+        StagedAcc = [1 - np.mean(self.G_Choices[sub][VU.DeterminedBlockSampling(len(self.G_Choices[sub]), NumBlock = NumStages, NumSample_inBlock = int(len(self.G_Choices[sub]) / NumStages))], axis = -1) for sub in sublist]
+
+        return StagedAcc
+
+    def FeedbackExperience(self, sublist, ax = None):
+
+        assert type(sublist) == int or type(sublist) == list or type(sublist) == np.ndarray, "Subjects list/number must be integer or list/array of integers"
+
+        if type(sublist) == int:
+
+            assert sublist >= 0 and sublist < self.population, "Insert valid subject number"
+            sublist = [sublist]
+
+            # FeEx = []
+
+            # for i in range(self.EL[sublist]):
+
+            #     FeEx.append(1 - np.sum(self.G_Rewards[sublist][:i]) / (i + 1))
+
+            # if ax != None:
+
+            #     ax.plot(FeEx)
+            #     ax.set_xlabel("Trial Number")
+            #     ax.set_ylabel("Accuracy")
+            #     ax.set_title("Subject " + str(sublist) + " perfromance during trials")
+
+        # else:
+
+        FeEx = []
+
+        sublist = np.array(sublist)
+
+        assert sublist.ndim == 1, "List of Subjects must be 1-Dimensional"
+        assert np.all(sublist < self.population) and np.all(sublist >= 0), "Invalid subject in list"
+
+        if ax != None:
+
+            print("We plot what you want, but trial lengths may be different!")
+            ax.set_xlabel("Trial Number")
+            ax.set_ylabel("Accuracy")
+
+        for sub in sublist:
+
+            FeEx_sub = []
+
+            for i in range(self.EL[sub]):
+
+                FeEx_sub.append(1 - np.sum(self.G_Rewards[sub][:i]) / (i + 1))
 
             if ax != None:
 
-                print("We plot what you want, but trial lengths may be different!")
-                ax.set_xlabel("Trial Number")
-                ax.set_ylabel("Accuracy")
+                ax.plot(FeEx_sub)
 
-            for sub in sublist:
+            FeEx.append(FeEx_sub)
 
-                Acc_sub = []
+        return FeEx
 
-                for i in range(self.EL[sub]):
+    def StagedFeedbackExperience(self, sublist, NumStages = 5):
 
-                    Acc_sub.append(1 - np.sum(self.G_Choices[sub][:i]) / (i + 1))
+        assert type(sublist) == int or type(sublist) == list or type(sublist) == np.ndarray, "Subjects list/number must be integer or list/array of integers"
 
-                if ax != None:
+        if type(sublist) == int:
 
-                    ax.plot(Acc_sub)
+            sublist = [sublist]
 
-                Acc.append(Acc_sub)
+        StagedFeEx = [1 - np.mean(self.G_Rewards[sub][VU.DeterminedBlockSampling(len(self.G_Rewards[sub]), NumBlock = NumStages, NumSample_inBlock = int(len(self.G_Rewards[sub]) / NumStages))], axis = -1) for sub in sublist]
 
-            return Acc
+        return StagedFeEx
 
     def ParametersLikelihood(self, sublist, **kwargs):
 
