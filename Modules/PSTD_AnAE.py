@@ -63,23 +63,6 @@ class PS_Task_Dataset():
 
             sublist = [sublist]
 
-        #     Acc = []
-
-        #     for i in range(self.EL[sublist]):
-
-        #         Acc.append(1 - np.sum(self.G_Choices[sublist][:i]) / (i + 1))
-
-        #     if ax != None:
-
-        #         ax.plot(Acc)
-        #         ax.set_xlabel("Trial Number")
-        #         ax.set_ylabel("Accuracy")
-        #         ax.set_title("Subject " + str(sublist) + " perfromance during trials")
-
-        #     return Acc
-
-        # else:
-
         Acc = []
 
         sublist = np.array(sublist)
